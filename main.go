@@ -20,7 +20,7 @@ func remove(key string) {
 	delete(m, key)
 }
 
-func list() {
+func list(m map[string]int) {
 	var keys []string
 	for key := range m {
 		keys = append(keys, key)
@@ -40,13 +40,14 @@ func main() {
 	add("ll", 2)
 	add("dd", 3)
 
-	if value, found := get("rr"); found {
-		fmt.Printf("Value of 'll': %d\n", value)
+	if value, found := get("ff"); found {
+		fmt.Printf("Value found: %d\n", value)
 	} else {
-		fmt.Println("Key 'll' not found.")
+		fmt.Println("Key not found.")
 	}
-
+	fmt.Println("Avant remove", m)
 	remove("ll")
+	fmt.Println("Apres remove", m)
 
-	list()
+	list(m)
 }
