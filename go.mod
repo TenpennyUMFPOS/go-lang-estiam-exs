@@ -1,3 +1,3 @@
-module main.go
+module dict
 
 go 1.21.5

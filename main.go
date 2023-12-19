@@ -1,53 +1,29 @@
 package main
 
 import (
+	"dict/packdict"
 	"fmt"
-	"sort"
 )
 
-var m map[string]int
-
-func get(key string) (int, bool) {
-	value, found := m[key]
-	return value, found
-}
-
-func add(key string, value int) {
-	m[key] = value
-}
-
-func remove(key string) {
-	delete(m, key)
-}
-
-func list(m map[string]int) {
-	var keys []string
-	for key := range m {
-		keys = append(keys, key)
-	}
-
-	sort.Strings(keys)
-
-	for _, key := range keys {
-		fmt.Printf("%s: %d\n", key, m[key])
-	}
-}
-
 func main() {
-	m = make(map[string]int)
+	dictionary := packdict.NewDictionary()
 
-	add("rr", 1)
-	add("ll", 2)
-	add("dd", 3)
+	dictionary.Add("estiam", "ecole")
+	dictionary.Add("go", "language")
 
-	if value, found := get("ff"); found {
-		fmt.Printf("Value found: %d\n", value)
+	fmt.Println("avant remove:")
+	dictionary.List()
+
+	keyToFind := "go"
+	if value, found := dictionary.Get(keyToFind); found {
+		fmt.Printf("Value found for key %s: %s\n", keyToFind, value)
 	} else {
-		fmt.Println("Key not found.")
+		fmt.Printf("Key not found: %s\n", keyToFind)
 	}
-	fmt.Println("Avant remove", m)
-	remove("ll")
-	fmt.Println("Apres remove", m)
 
-	list(m)
+	keyToRemove := "go"
+	dictionary.Remove(keyToRemove)
+
+	fmt.Println("apres remove:")
+	dictionary.List()
 }
