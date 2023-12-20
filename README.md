@@ -3,6 +3,8 @@
     1 - go run .
     2 - http://localhost:8090/list
 ## HELP SOURCES 
+    - https://pkg.go.dev/net/http
+    - https://stackoverflow.com/questions/25465566/golang-parse-json-array-into-data-structure
     - https://medium.com/goturkiye/concurrency-in-go-channels-and-waitgroups-25dd43064d1
     - https://gobyexample.com/waitgroups
 
