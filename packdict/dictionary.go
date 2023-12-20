@@ -1,42 +1,102 @@
+// dictionary.go
 package packdict
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"os"
 	"sort"
 )
 
+type DictionaryEntry struct {
+	Nom        string `json:"nom"`
+	Definition string `json:"definition"`
+}
+
 type Dictionary struct {
-	m map[string]string
+	Entries []DictionaryEntry
 }
 
 func NewDictionary() *Dictionary {
 	return &Dictionary{
-		m: make(map[string]string),
+		Entries: make([]DictionaryEntry, 0),
 	}
 }
 
-func (d *Dictionary) Get(key string) (string, bool) {
-	value, found := d.m[key]
-	return value, found
+func (d *Dictionary) Get(nom string) (string, bool) {
+	for _, entry := range d.Entries {
+		if entry.Nom == nom {
+			return entry.Definition, true
+		}
+	}
+	return "", false
 }
 
-func (d *Dictionary) Add(key string, value string) {
-	d.m[key] = value
+func (d *Dictionary) Add(nom, definition string) error {
+	entry := DictionaryEntry{Nom: nom, Definition: definition}
+	d.Entries = append(d.Entries, entry)
+
+	err := d.saveToJSON()
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
-func (d *Dictionary) Remove(key string) {
-	delete(d.m, key)
+func (d *Dictionary) Remove(nom string) error {
+	var index int
+	for i, entry := range d.Entries {
+		if entry.Nom == nom {
+			index = i
+			break
+		}
+	}
+	d.Entries = append(d.Entries[:index], d.Entries[index+1:]...)
+
+	err := d.saveToJSON()
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (d *Dictionary) List() {
-	var keys []string
-	for key := range d.m {
-		keys = append(keys, key)
+	sort.Slice(d.Entries, func(i, j int) bool {
+		return d.Entries[i].Nom < d.Entries[j].Nom
+	})
+
+	for _, entry := range d.Entries {
+		fmt.Printf("%s: %s\n", entry.Nom, entry.Definition)
+	}
+}
+
+func (d *Dictionary) LoadFromJSON(filename string) error {
+	data, err := ioutil.ReadFile(filename)
+	if err != nil {
+		return err
 	}
 
-	sort.Strings(keys)
-
-	for _, key := range keys {
-		fmt.Printf("%s: %s\n", key, d.m[key])
+	err = json.Unmarshal(data, &d.Entries)
+	if err != nil {
+		return err
 	}
+
+	return nil
+}
+
+func (d *Dictionary) saveToJSON() error {
+	data, err := json.MarshalIndent(d.Entries, "", "  ")
+	if err != nil {
+		return err
+	}
+
+	err = ioutil.WriteFile("details.json", data, os.ModePerm)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

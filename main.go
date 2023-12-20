@@ -1,3 +1,4 @@
+// main.go
 package main
 
 import (
@@ -8,22 +9,48 @@ import (
 func main() {
 	dictionary := packdict.NewDictionary()
 
-	dictionary.Add("estiam", "ecole")
-	dictionary.Add("go", "language")
-
-	fmt.Println("avant remove:")
-	dictionary.List()
-
-	keyToFind := "go"
-	if value, found := dictionary.Get(keyToFind); found {
-		fmt.Printf("Value found for key %s: %s\n", keyToFind, value)
-	} else {
-		fmt.Printf("Key not found: %s\n", keyToFind)
+	// Add some entries
+	err := dictionary.Add("estiam", "ecole")
+	if err != nil {
+		fmt.Println("Error adding entry:", err)
 	}
 
-	keyToRemove := "go"
-	dictionary.Remove(keyToRemove)
+	err = dictionary.Add("platform", "teams")
+	if err != nil {
+		fmt.Println("Error adding entry:", err)
+	}
 
-	fmt.Println("apres remove:")
+	err = dictionary.Add("formateur", "Aziz")
+	if err != nil {
+		fmt.Println("Error adding entry:", err)
+	}
+
+	fmt.Println("Before remove:")
+	dictionary.List()
+
+	nomToFind := "estiam"
+	if definition, found := dictionary.Get(nomToFind); found {
+		fmt.Printf("Definition found for nom %s: %s\n", nomToFind, definition)
+	} else {
+		fmt.Printf("Nom not found: %s\n", nomToFind)
+	}
+
+	nomToAdd := "new_nom"
+	definitionToAdd := "new_definition"
+	err = dictionary.Add(nomToAdd, definitionToAdd)
+	if err != nil {
+		fmt.Println("Error adding entry:", err)
+	}
+
+	fmt.Println("After add:")
+	dictionary.List()
+
+	nomToRemove := "estiam"
+	err = dictionary.Remove(nomToRemove)
+	if err != nil {
+		fmt.Println("Error removing entry:", err)
+	}
+
+	fmt.Println("After remove:")
 	dictionary.List()
 }
