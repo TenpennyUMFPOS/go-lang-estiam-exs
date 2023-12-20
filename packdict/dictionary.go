@@ -100,3 +100,20 @@ func (d *Dictionary) saveToJSON() error {
 
 	return nil
 }
+
+func (d *Dictionary) Update(nom, newDefinition string) error {
+	for i, entry := range d.Entries {
+		if entry.Nom == nom {
+			d.Entries[i].Definition = newDefinition
+
+			err := d.saveToJSON()
+			if err != nil {
+				return err
+			}
+
+			return nil
+		}
+	}
+
+	return fmt.Errorf("Entry not found with name: %s", nom)
+}

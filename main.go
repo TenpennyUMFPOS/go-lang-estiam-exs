@@ -10,19 +10,8 @@ func main() {
 	dictionary := packdict.NewDictionary()
 
 	err := dictionary.Add("exemple", "exemple def")
-	if err != nil {
-		fmt.Println("Error adding entry:", err)
-	}
-
 	err = dictionary.Add("platform", "teams")
-	if err != nil {
-		fmt.Println("Error adding entry:", err)
-	}
-
 	err = dictionary.Add("formateur", "Aziz")
-	if err != nil {
-		fmt.Println("Error adding entry:", err)
-	}
 
 	fmt.Println("Before remove:")
 	dictionary.List()
@@ -34,10 +23,7 @@ func main() {
 		nomToAdd := "ecole"
 		definitionToAdd := "estiam"
 		err = dictionary.Add(nomToAdd, definitionToAdd)
-		if err != nil {
-			fmt.Println("Error adding entry:", err)
-		}
-		fmt.Printf("Nom not found it's being added")
+		fmt.Printf("Nom not found but it's being added")
 	}
 
 	fmt.Println("After add:")
@@ -50,5 +36,15 @@ func main() {
 	}
 
 	fmt.Println("After remove:")
+	dictionary.List()
+
+	nomToUpdate := "formateur"
+	newDefinition := "updated definition"
+	err = dictionary.Update(nomToUpdate, newDefinition)
+	if err != nil {
+		fmt.Println("Error updating entry:", err)
+	}
+
+	fmt.Println("After update:")
 	dictionary.List()
 }
