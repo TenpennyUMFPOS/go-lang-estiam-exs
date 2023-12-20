@@ -1,4 +1,7 @@
 ## BOUTHOURI Mohamed (Aziz) 
+## HOW TO RUN
+    1 - go run .
+    2 - http://localhost:8090/list
 ## HELP SOURCES 
     - https://medium.com/goturkiye/concurrency-in-go-channels-and-waitgroups-25dd43064d1
     - https://gobyexample.com/waitgroups

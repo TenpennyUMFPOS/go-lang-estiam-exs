@@ -3,7 +3,9 @@ package main
 
 import (
 	"dict/packdict"
+	"encoding/json"
 	"fmt"
+	"net/http"
 	"sync"
 )
 
@@ -18,6 +20,19 @@ func main() {
 		for entry := range addChannel {
 			dictionary.Add(entry.Nom, entry.Definition)
 
+		}
+	}()
+
+	// HTTP server setup
+	http.HandleFunc("/list", func(w http.ResponseWriter, req *http.Request) {
+		handleList(dictionary, w, req)
+	})
+
+	// Start the HTTP server
+	go func() {
+		fmt.Println("HTTP server listening on :8090...")
+		if err := http.ListenAndServe(":8090", nil); err != nil {
+			fmt.Println("Error starting HTTP server:", err)
 		}
 	}()
 
@@ -41,44 +56,60 @@ func main() {
 	wg.Wait()
 
 	close(addChannel)
+	select {}
 
-	// channel
+	// end channel
 
-	err := dictionary.Add("go", "language de programation")
+	/*
+		err := dictionary.Add("go", "language de programation")
 
-	fmt.Println("Before remove:")
-	dictionary.List()
+		fmt.Println("Before remove:")
+		dictionary.List()
 
-	nomToFind := "estiam"
-	if definition, found := dictionary.Get(nomToFind); found {
-		fmt.Printf("Definition found for nom %s: %s\n", nomToFind, definition)
-	} else {
-		nomToAdd := "ecole"
-		definitionToAdd := "estiam"
-		err = dictionary.Add(nomToAdd, definitionToAdd)
-		fmt.Printf("Nom not found but it's being added")
+		nomToFind := "estiam"
+		if definition, found := dictionary.Get(nomToFind); found {
+			fmt.Printf("Definition found for nom %s: %s\n", nomToFind, definition)
+		} else {
+			nomToAdd := "ecole"
+			definitionToAdd := "estiam"
+			err = dictionary.Add(nomToAdd, definitionToAdd)
+			fmt.Printf("Nom not found but it's being added")
+		}
+
+		fmt.Println("After add:")
+		dictionary.List()
+
+		nomToRemove := "estiam"
+		err = dictionary.Remove(nomToRemove)
+		if err != nil {
+			fmt.Println("Error removing entry:", err)
+		}
+
+		fmt.Println("After remove:")
+		dictionary.List()
+
+		nomToUpdate := "formateur"
+		newDefinition := "updated definition"
+		err = dictionary.Update(nomToUpdate, newDefinition)
+		if err != nil {
+			fmt.Println("Error updating entry:", err)
+		}
+
+		fmt.Println("After update:")
+		dictionary.List()*/
+
+}
+
+// Handle incoming HTTP requests to list entries from the dictionary
+func handleList(dictionary *packdict.Dictionary, w http.ResponseWriter, req *http.Request) {
+	if req.Method != http.MethodGet {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
 	}
 
-	fmt.Println("After add:")
-	dictionary.List()
-
-	nomToRemove := "estiam"
-	err = dictionary.Remove(nomToRemove)
-	if err != nil {
-		fmt.Println("Error removing entry:", err)
+	w.Header().Set("Content-Type", "application/json")
+	if err := json.NewEncoder(w).Encode(dictionary.Entries); err != nil {
+		http.Error(w, "Error encoding JSON", http.StatusInternalServerError)
+		return
 	}
-
-	fmt.Println("After remove:")
-	dictionary.List()
-
-	nomToUpdate := "formateur"
-	newDefinition := "updated definition"
-	err = dictionary.Update(nomToUpdate, newDefinition)
-	if err != nil {
-		fmt.Println("Error updating entry:", err)
-	}
-
-	fmt.Println("After update:")
-	dictionary.List()
-
 }
