@@ -37,7 +37,7 @@ func (d *Dictionary) Add(nom, definition string) error {
 	entry := DictionaryEntry{Nom: nom, Definition: definition}
 	d.Entries = append(d.Entries, entry)
 
-	err := d.saveToJSON()
+	err := d.saveToJSON("details.json")
 	if err != nil {
 		return err
 	}
@@ -55,7 +55,7 @@ func (d *Dictionary) Remove(nom string) error {
 	}
 	d.Entries = append(d.Entries[:index], d.Entries[index+1:]...)
 
-	err := d.saveToJSON()
+	err := d.saveToJSON("details.json")
 	if err != nil {
 		return err
 	}
@@ -87,13 +87,13 @@ func (d *Dictionary) LoadFromJSON(filename string) error {
 	return nil
 }
 
-func (d *Dictionary) saveToJSON() error {
+func (d *Dictionary) saveToJSON(filename string) error {
 	data, err := json.MarshalIndent(d.Entries, "", "  ")
 	if err != nil {
 		return err
 	}
 
-	err = ioutil.WriteFile("details.json", data, os.ModePerm)
+	err = ioutil.WriteFile(filename, data, os.ModePerm)
 	if err != nil {
 		return err
 	}
@@ -106,7 +106,7 @@ func (d *Dictionary) Update(nom, newDefinition string) error {
 		if entry.Nom == nom {
 			d.Entries[i].Definition = newDefinition
 
-			err := d.saveToJSON()
+			err := d.saveToJSON("details.json")
 			if err != nil {
 				return err
 			}

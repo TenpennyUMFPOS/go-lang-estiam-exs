@@ -4,14 +4,47 @@ package main
 import (
 	"dict/packdict"
 	"fmt"
+	"sync"
 )
 
 func main() {
 	dictionary := packdict.NewDictionary()
 
-	err := dictionary.Add("exemple", "exemple def")
-	err = dictionary.Add("platform", "teams")
-	err = dictionary.Add("formateur", "Aziz")
+	//Start chanel
+	addChannel := make(chan packdict.DictionaryEntry)
+
+	var wg sync.WaitGroup
+	go func() {
+		for entry := range addChannel {
+			dictionary.Add(entry.Nom, entry.Definition)
+
+		}
+	}()
+
+	entriesToAdd := []packdict.DictionaryEntry{
+		{Nom: "exemple", Definition: "exemple def"},
+		{Nom: "platform", Definition: "teams"},
+		{Nom: "formateur", Definition: "Aziz"},
+	}
+
+	for _, entry := range entriesToAdd {
+		wg.Add(1)
+		go func(e packdict.DictionaryEntry) {
+			defer wg.Done()
+			fmt.Println("chanel working ..")
+			fmt.Printf("Sending entry: %s\n", e.Nom)
+			// Send the entry to the channel
+			addChannel <- e
+		}(entry)
+	}
+
+	wg.Wait()
+
+	close(addChannel)
+
+	// channel
+
+	err := dictionary.Add("go", "language de programation")
 
 	fmt.Println("Before remove:")
 	dictionary.List()
@@ -47,4 +80,5 @@ func main() {
 
 	fmt.Println("After update:")
 	dictionary.List()
+
 }
