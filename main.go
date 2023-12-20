@@ -9,7 +9,7 @@ import (
 func main() {
 	dictionary := packdict.NewDictionary()
 
-	err := dictionary.Add("estiam", "ecole")
+	err := dictionary.Add("exemple", "exemple def")
 	if err != nil {
 		fmt.Println("Error adding entry:", err)
 	}
