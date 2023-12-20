@@ -9,7 +9,6 @@ import (
 func main() {
 	dictionary := packdict.NewDictionary()
 
-	// Add some entries
 	err := dictionary.Add("estiam", "ecole")
 	if err != nil {
 		fmt.Println("Error adding entry:", err)
@@ -32,14 +31,13 @@ func main() {
 	if definition, found := dictionary.Get(nomToFind); found {
 		fmt.Printf("Definition found for nom %s: %s\n", nomToFind, definition)
 	} else {
-		fmt.Printf("Nom not found: %s\n", nomToFind)
-	}
-
-	nomToAdd := "new_nom"
-	definitionToAdd := "new_definition"
-	err = dictionary.Add(nomToAdd, definitionToAdd)
-	if err != nil {
-		fmt.Println("Error adding entry:", err)
+		nomToAdd := "ecole"
+		definitionToAdd := "estiam"
+		err = dictionary.Add(nomToAdd, definitionToAdd)
+		if err != nil {
+			fmt.Println("Error adding entry:", err)
+		}
+		fmt.Printf("Nom not found it's being added")
 	}
 
 	fmt.Println("After add:")
