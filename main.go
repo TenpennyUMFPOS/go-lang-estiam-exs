@@ -5,18 +5,17 @@ import (
 	"dict/packdict"
 	"fmt"
 	"net/http"
+	"sort"
 )
 
 func main() {
 	dictionary := packdict.NewDictionary()
 
-	// Load initial data from JSON file
 	err := dictionary.LoadFromJSON("details.json")
 	if err != nil {
 		fmt.Println("Error loading data from JSON:", err)
 	}
 
-	// Define HTTP handlers
 	http.HandleFunc("/get", func(w http.ResponseWriter, r *http.Request) {
 		nom := r.URL.Query().Get("nom")
 		definition, found := dictionary.Get(nom)
@@ -51,7 +50,12 @@ func main() {
 	})
 
 	http.HandleFunc("/list", func(w http.ResponseWriter, r *http.Request) {
-		dictionary.List()
+		sort.Slice(dictionary.Entries, func(i, j int) bool {
+			return dictionary.Entries[i].Nom < dictionary.Entries[j].Definition
+		})
+		for _, entry := range dictionary.Entries {
+			fmt.Fprintf(w, "%s: %s \n", entry.Nom, entry.Definition)
+		}
 	})
 
 	http.HandleFunc("/update", func(w http.ResponseWriter, r *http.Request) {
@@ -66,7 +70,6 @@ func main() {
 		fmt.Fprint(w, "Entry updated successfully")
 	})
 
-	// Start the HTTP server
 	err = http.ListenAndServe(":8090", nil)
 	if err != nil {
 		fmt.Println("Error starting the server:", err)

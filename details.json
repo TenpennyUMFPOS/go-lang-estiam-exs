@@ -1,22 +1,6 @@
 [
   {
-    "nom": "exemple",
-    "definition": "exemple def"
-  },
-  {
-    "nom": "rr",
-    "definition": ""
-  },
-  {
-    "nom": "example",
-    "definition": ""
-  },
-  {
-    "nom": "example",
-    "definition": "some definition"
-  },
-  {
-    "nom": "peter",
-    "definition": "parker spiderman"
+    "nom": "go",
+    "definition": "language programmation"
   }
 ]

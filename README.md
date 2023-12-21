@@ -8,6 +8,7 @@
 
 
 ## HELP SOURCES 
+    - https://transform.tools/json-to-go
     - https://pkg.go.dev/net/http
     - https://stackoverflow.com/questions/25465566/golang-parse-json-array-into-data-structure
     - https://medium.com/goturkiye/concurrency-in-go-channels-and-waitgroups-25dd43064d1
