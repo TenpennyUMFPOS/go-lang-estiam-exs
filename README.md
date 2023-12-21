@@ -1,7 +1,12 @@
 ## BOUTHOURI Mohamed (Aziz) 
 ## HOW TO RUN
-    1 - go run .
-    2 - http://localhost:8090/list
+     - go run .
+     - ADD : curl "http://localhost:8090/add?nom=peter&definition=parker%20spiderman"
+     - REMOVE : curl "http://localhost:8090/remove?nom=formateur"
+     - GET : curl "http://localhost:8090/get?nom=peter"
+     - UPATE : curl "http://localhost:8090/update?nom=example&newDefinition=newValue"
+
+
 ## HELP SOURCES 
     - https://pkg.go.dev/net/http
     - https://stackoverflow.com/questions/25465566/golang-parse-json-array-into-data-structure

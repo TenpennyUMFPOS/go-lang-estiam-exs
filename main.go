@@ -3,113 +3,72 @@ package main
 
 import (
 	"dict/packdict"
-	"encoding/json"
 	"fmt"
 	"net/http"
-	"sync"
 )
 
 func main() {
 	dictionary := packdict.NewDictionary()
 
-	//Start chanel
-	addChannel := make(chan packdict.DictionaryEntry)
+	// Load initial data from JSON file
+	err := dictionary.LoadFromJSON("details.json")
+	if err != nil {
+		fmt.Println("Error loading data from JSON:", err)
+	}
 
-	var wg sync.WaitGroup
-	go func() {
-		for entry := range addChannel {
-			dictionary.Add(entry.Nom, entry.Definition)
-
+	// Define HTTP handlers
+	http.HandleFunc("/get", func(w http.ResponseWriter, r *http.Request) {
+		nom := r.URL.Query().Get("nom")
+		definition, found := dictionary.Get(nom)
+		if found {
+			fmt.Fprintf(w, "Definition for %s: %s", nom, definition)
+		} else {
+			http.Error(w, "Entry not found", http.StatusNotFound)
 		}
-	}()
+	})
 
-	// HTTP server setup
-	http.HandleFunc("/list", func(w http.ResponseWriter, req *http.Request) {
-		handleList(dictionary, w, req)
+	http.HandleFunc("/add", func(w http.ResponseWriter, r *http.Request) {
+		nom := r.URL.Query().Get("nom")
+		definition := r.URL.Query().Get("definition")
+		err := dictionary.Add(nom, definition)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Error adding entry: %s", err), http.StatusInternalServerError)
+			return
+		}
+
+		fmt.Fprint(w, "Entry added successfully")
+	})
+
+	http.HandleFunc("/remove", func(w http.ResponseWriter, r *http.Request) {
+		nom := r.URL.Query().Get("nom")
+		err := dictionary.Remove(nom)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Error removing entry: %s", err), http.StatusInternalServerError)
+			return
+		}
+
+		fmt.Fprint(w, "Entry removed successfully")
+	})
+
+	http.HandleFunc("/list", func(w http.ResponseWriter, r *http.Request) {
+		dictionary.List()
+	})
+
+	http.HandleFunc("/update", func(w http.ResponseWriter, r *http.Request) {
+		nom := r.URL.Query().Get("nom")
+		newDefinition := r.URL.Query().Get("newDefinition")
+		err := dictionary.Update(nom, newDefinition)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Error updating entry: %s", err), http.StatusInternalServerError)
+			return
+		}
+
+		fmt.Fprint(w, "Entry updated successfully")
 	})
 
 	// Start the HTTP server
-	go func() {
-		fmt.Println("HTTP server listening on :8090...")
-		if err := http.ListenAndServe(":8090", nil); err != nil {
-			fmt.Println("Error starting HTTP server:", err)
-		}
-	}()
-
-	entriesToAdd := []packdict.DictionaryEntry{
-		{Nom: "exemple", Definition: "exemple def"},
-		{Nom: "platform", Definition: "teams"},
-		{Nom: "formateur", Definition: "Aziz"},
-	}
-
-	for _, entry := range entriesToAdd {
-		wg.Add(1)
-		go func(e packdict.DictionaryEntry) {
-			defer wg.Done()
-			fmt.Println("chanel working ..")
-			fmt.Printf("Sending entry: %s\n", e.Nom)
-			// Send the entry to the channel
-			addChannel <- e
-		}(entry)
-	}
-
-	wg.Wait()
-
-	close(addChannel)
-	select {}
-
-	// end channel
-
-	/*
-		err := dictionary.Add("go", "language de programation")
-
-		fmt.Println("Before remove:")
-		dictionary.List()
-
-		nomToFind := "estiam"
-		if definition, found := dictionary.Get(nomToFind); found {
-			fmt.Printf("Definition found for nom %s: %s\n", nomToFind, definition)
-		} else {
-			nomToAdd := "ecole"
-			definitionToAdd := "estiam"
-			err = dictionary.Add(nomToAdd, definitionToAdd)
-			fmt.Printf("Nom not found but it's being added")
-		}
-
-		fmt.Println("After add:")
-		dictionary.List()
-
-		nomToRemove := "estiam"
-		err = dictionary.Remove(nomToRemove)
-		if err != nil {
-			fmt.Println("Error removing entry:", err)
-		}
-
-		fmt.Println("After remove:")
-		dictionary.List()
-
-		nomToUpdate := "formateur"
-		newDefinition := "updated definition"
-		err = dictionary.Update(nomToUpdate, newDefinition)
-		if err != nil {
-			fmt.Println("Error updating entry:", err)
-		}
-
-		fmt.Println("After update:")
-		dictionary.List()*/
-
-}
-
-// Handle incoming HTTP requests to list entries from the dictionary
-func handleList(dictionary *packdict.Dictionary, w http.ResponseWriter, req *http.Request) {
-	if req.Method != http.MethodGet {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	if err := json.NewEncoder(w).Encode(dictionary.Entries); err != nil {
-		http.Error(w, "Error encoding JSON", http.StatusInternalServerError)
-		return
+	err = http.ListenAndServe(":8090", nil)
+	if err != nil {
+		fmt.Println("Error starting the server:", err)
 	}
 }
